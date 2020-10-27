@@ -77,7 +77,7 @@ def index():
 
 
 @app.route("/buy", methods=["GET", "POST"])
-# @login_required
+@login_required
 def buy():
     if request.method == "POST":
         share = int(request.form.get("shares"))
@@ -142,7 +142,7 @@ def buy():
 
 
 @app.route("/history")
-# @login_required
+@login_required
 def history():
     """Show history of transactions"""
     history = db.execute("SELECT * FROM histories WHERE id=:id", id=session["user_id"])
@@ -202,7 +202,7 @@ def logout():
 
 
 @app.route("/quote", methods=["GET", "POST"])
-# @login_required
+@login_required
 def quote():
     """Get stock quote."""
     if request.method == "POST":
@@ -261,7 +261,8 @@ def register():
 
 
 @app.route("/sell", methods=["GET", "POST"])
-# @login_required
+
+@login_required
 def sell():
     """Sell shares of stock"""
     holdings = db.execute("SELECT * FROM portfolio WHERE id=:id", id = session["user_id"])
