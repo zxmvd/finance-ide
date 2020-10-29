@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block main %}
+<h3><span class="badge badge-secondary">Stock Holdings</span></h3>
+  <div class="table-responsive-sm">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -36,11 +38,13 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4"></td>
+                <td colspan="3"></td>
+                <td class="value">TOTALS</td>
                 <td class="value">{{total_value}}</td>
             </tr>
         </tfoot>
 
 
     </table>
+</div>
 {% endblock %}

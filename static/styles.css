@@ -26,6 +26,18 @@ nav .navbar-brand .green
 /*{*/
 /*    text-align: left;*/
 /*}*/
+#navbar 
+{
+    top: 180px;
+
+
+}
+
+.nav-item{
+    border-right: #707070 2px solid;
+    line-height: 8px;
+
+}
 
 .value
 {
@@ -49,9 +61,43 @@ main
     /* center contents */
     text-align: center;
 }
+.logo_img
+{
+    width: 320px;
+}
 
 main img
 {
     /* constrain images on small screens */
     max-width: 100%;
 }
+
+.nav-btn 
+{
+    text-align: end;
+
+}
+.badge
+{
+    background-color: #b3b3b3;
+    float: left;
+    margin-bottom: 1rem;
+
+    margin-top: 0;
+}
+
+@media only screen and (max-width: 720px) {
+    .navbar-brand{
+      width: 70%;
+      height: 70%;
+    } 
+     .logo_img {
+        width: 100%;
+        height: 100%;
+      }
+
+    .nav-item {
+        border-style: none;
+    }
+
+  }
