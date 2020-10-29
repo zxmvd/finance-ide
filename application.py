@@ -34,8 +34,8 @@ Session(app)
 db = SQL("sqlite:///finance.db")
 
 # Make sure API key is set
-# if not os.environ.get("API_KEY"):
-#     raise RuntimeError("API_KEY not set")
+if not os.environ.get("API_KEY"):
+    raise RuntimeError("API_KEY not set")
 
 
 @app.route("/")
@@ -66,6 +66,20 @@ def index():
 
     return render_template("index.html", holdings=holdings, cash=usd(cash), total_value=usd(total_value))
 
+@app.route("/quote", methods=["GET", "POST"])
+@login_required
+def quote():
+    """Get stock quote."""
+    if request.method == "POST":
+        symbol = request.form.get("quote")
+        result = lookup(symbol)
+        if result != None:
+            return render_template("quoted.html", result=result)
+        else:
+            return apology("Invalid Symbol", 400)
+
+    else:
+        return render_template("quote.html")
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -118,6 +132,49 @@ def buy():
     else:
         return render_template("buy.html")
 
+@app.route("/sell", methods=["GET", "POST"])
+@login_required
+def sell():
+    """Sell shares of stock"""
+    holdings = db.execute(
+        "SELECT * FROM portfolio WHERE id=:id", id=session["user_id"])
+    cash = db.execute("SELECT cash FROM users WHERE id=:id",
+                      id=session["user_id"])
+    current_cash = cash[0]["cash"]
+
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        shares_for_sell = int(request.form.get("shares"))
+        current_shares = db.execute("SELECT shares FROM portfolio WHERE id=:id AND symbol=:symbol",
+                                    id=session["user_id"], symbol=symbol)
+        updated_shares = current_shares[0]["shares"] - shares_for_sell
+        stock_price = lookup(symbol)
+        updated_price = stock_price["price"]
+        cash_credit = shares_for_sell*updated_price
+        updated_cash = current_cash + cash_credit
+
+        if shares_for_sell > current_shares[0]["shares"]:
+            return apology("YOU MUST SELL LESS SHARES")
+
+        db.execute("UPDATE users SET cash=:cash WHERE id=:id",
+                   cash=updated_cash, id=session["user_id"])
+
+        db.execute("INSERT INTO histories (symbol, shares, price, id) VALUES(:symbol, :shares, :price, :id)",
+                   symbol=symbol, shares=-shares_for_sell, price=usd(updated_price),
+                   id=session["user_id"])
+        if updated_shares == 0:
+            db.execute("DELETE FROM portfolio WHERE id=:id AND symbol=:symbol",
+                       id=session["user_id"], symbol=symbol)
+        else:
+            db.execute("UPDATE portfolio SET shares=:shares, price=:price, total=:total \
+                   WHERE id=:id AND symbol=:symbol",
+                       shares=updated_shares, price=usd(updated_price), total=usd(updated_shares*updated_price),
+                       id=session["user_id"], symbol=symbol)
+        flash("SOLD!")
+        return redirect("/")
+
+    else:
+        return render_template("sell.html", holdings=holdings)
 
 @app.route("/history")
 @login_required
@@ -180,22 +237,6 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-
-@app.route("/quote", methods=["GET", "POST"])
-@login_required
-def quote():
-    """Get stock quote."""
-    if request.method == "POST":
-        symbol = request.form.get("quote")
-        result = lookup(symbol)
-        if result != None:
-            return render_template("quoted.html", result=result)
-        else:
-            return apology("Invalid Symbol", 400)
-
-    else:
-        return render_template("quote.html")
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
@@ -230,54 +271,6 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
-
-    #return apology("TODO")
-
-
-@app.route("/sell", methods=["GET", "POST"])
-@login_required
-def sell():
-    """Sell shares of stock"""
-    holdings = db.execute(
-        "SELECT * FROM portfolio WHERE id=:id", id=session["user_id"])
-    cash = db.execute("SELECT cash FROM users WHERE id=:id",
-                      id=session["user_id"])
-    current_cash = cash[0]["cash"]
-
-    if request.method == "POST":
-        symbol = request.form.get("symbol")
-        shares_for_sell = int(request.form.get("shares"))
-        current_shares = db.execute("SELECT shares FROM portfolio WHERE id=:id AND symbol=:symbol",
-                                    id=session["user_id"], symbol=symbol)
-        updated_shares = current_shares[0]["shares"] - shares_for_sell
-        stock_price = lookup(symbol)
-        updated_price = stock_price["price"]
-        cash_credit = shares_for_sell*updated_price
-        updated_cash = current_cash + cash_credit
-
-        if shares_for_sell > current_shares[0]["shares"]:
-            return apology("YOU MUST SELL LESS SHARES")
-
-        db.execute("UPDATE users SET cash=:cash WHERE id=:id",
-                   cash=updated_cash, id=session["user_id"])
-
-        db.execute("INSERT INTO histories (symbol, shares, price, id) VALUES(:symbol, :shares, :price, :id)",
-                   symbol=symbol, shares=-shares_for_sell, price=usd(updated_price),
-                   id=session["user_id"])
-        if updated_shares == 0:
-            db.execute("DELETE FROM portfolio WHERE id=:id AND symbol=:symbol",
-                       id=session["user_id"], symbol=symbol)
-        else:
-            db.execute("UPDATE portfolio SET shares=:shares, price=:price, total=:total \
-                   WHERE id=:id AND symbol=:symbol",
-                       shares=updated_shares, price=usd(updated_price), total=usd(updated_shares*updated_price),
-                       id=session["user_id"], symbol=symbol)
-
-        flash("SOLD!")
-        return redirect("/")
-
-    else:
-        return render_template("sell.html", holdings=holdings)
 
 
 def errorhandler(e):
