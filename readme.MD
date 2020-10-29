@@ -9,4 +9,6 @@ user: trader01 </br>
 psw:123 </br>
 Trade with US Stock Market Symbols. (eg: AAPL, TSLA, KO, NFLX, etc)
 
-<img src="/static/screen_shot_stock-sim.png" width="900" href="https://stock-sim-app.herokuapp.com/">
+<a href="https://stock-sim-app.herokuapp.com/">
+<img src="/static/screen_shot_stock-sim.png" width="900">
+</a>
