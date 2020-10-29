@@ -8,3 +8,5 @@ Go To <a href="https://stock-sim-app.herokuapp.com/">DEMO SITE</a></br>
 user: trader01 </br>
 psw:123 </br>
 Trade with US Stock Market Symbols. (eg: AAPL, TSLA, KO, NFLX, etc)
+
+<img src="https://github.com/zxmvd/stock-market-simulator/blob/master/static/screen_shot_stock-sim.png" width="600">
