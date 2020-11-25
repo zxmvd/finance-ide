@@ -5,9 +5,8 @@ Realtime stock exchange simulator. <br>
 Trade without any risk of losing real money. </br>
 On registration, the user will recerive 10k in cash for trading.</br><hr>
 Go To <a href="https://stock-sim-app.herokuapp.com/"><strong>DEMO SITE</strong></a></br>
-user: trader01 </br>
-psw:123 </br>
-Trade with US Stock Market Symbols. (eg: AAPL, TSLA, KO, NFLX, etc)<br>
+
+Trade with US Stock Market Symbols only! (eg: AAPL, TSLA, KO, NFLX, etc)<br>
 Backend code in <a href="application.py">application.py</a>
 
 <a href="https://stock-sim-app.herokuapp.com/">
